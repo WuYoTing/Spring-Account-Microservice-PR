@@ -8,6 +8,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,6 +19,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 @Log4j2
 @AllArgsConstructor(onConstructor = @__(@Autowired))
+@NoArgsConstructor
 public class AuthTokenFilter extends OncePerRequestFilter {
 
 	private JwtUtils jwtUtils;
@@ -30,7 +32,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
 		try {
 			// get JWT from the Authorization header (by removing Bearer prefix)
-			String jwt = parseJwt(request);
+			String jwt = jwtUtils.parseJwt(request);
 			if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
 				String username = jwtUtils.getUserNameFromJwtToken(jwt);
 				UserDetails userDetails = userDetailsService.loadUserByUsername(username);

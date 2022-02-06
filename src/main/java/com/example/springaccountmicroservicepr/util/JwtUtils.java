@@ -3,10 +3,12 @@ package com.example.springaccountmicroservicepr.util;
 import com.example.springaccountmicroservicepr.pojo.dto.UserDetailsImpl;
 import io.jsonwebtoken.*;
 import java.util.Date;
+import javax.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 @Log4j2
 @Component
@@ -18,6 +20,9 @@ public class JwtUtils {
 	@Value("${account.service.jwtExpirationMs}")
 	private int jwtExpirationMs;
 
+	/**
+	 * generate a JWT from username, date, expiration, secret
+	 */
 	public String generateJwtToken(Authentication authentication) {
 
 		UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
@@ -48,5 +53,15 @@ public class JwtUtils {
 		}
 
 		return false;
+	}
+
+	public String parseJwt(HttpServletRequest request) {
+		String headerAuth = request.getHeader("Authorization");
+
+		if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
+			return headerAuth.substring(7, headerAuth.length());
+		}
+
+		return null;
 	}
 }
