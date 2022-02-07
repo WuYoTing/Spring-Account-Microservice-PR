@@ -15,6 +15,7 @@ public class SignupRequest {
 	@Size(min = 3, max = 20)
 	private String username;
 
+	// Todo Make Email Check more complex
 	@NotBlank
 	@Size(max = 50)
 	@Email
