@@ -5,6 +5,7 @@ import com.example.springaccountmicroservicepr.pojo.request.LoginRequest;
 import com.example.springaccountmicroservicepr.pojo.request.SignupRequest;
 import com.example.springaccountmicroservicepr.pojo.response.JwtResponse;
 import com.example.springaccountmicroservicepr.pojo.response.MessageResponse;
+import com.example.springaccountmicroservicepr.pojo.vo.ProgressStatus;
 import com.example.springaccountmicroservicepr.services.AuthenticateService;
 import com.example.springaccountmicroservicepr.util.JwtUtils;
 import lombok.AllArgsConstructor;
@@ -53,7 +54,7 @@ public class AuthController {
 	@PostMapping("/signup")
 	public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
 		authenticateService.signup(signUpRequest.getUsername(), signUpRequest.getEmail(), signUpRequest.getRole(), signUpRequest.getPassword());
-		return new ResponseEntity<>(new MessageResponse("User registered successfully!"), HttpStatus.OK);
+		return new ResponseEntity<>(new MessageResponse(ProgressStatus.Success, "User registered successfully!"), HttpStatus.OK);
 	}
 }
 

@@ -1,7 +1,7 @@
 package com.example.springaccountmicroservicepr.services;
 
 
-import com.example.springaccountmicroservicepr.pojo.dao.Role;
+import com.example.springaccountmicroservicepr.pojo.dao.RolesType;
 import com.example.springaccountmicroservicepr.pojo.dao.User;
 import com.example.springaccountmicroservicepr.pojo.vo.ERole;
 import com.example.springaccountmicroservicepr.repository.RoleRepository;
@@ -44,33 +44,33 @@ public class AuthenticateService {
 
 		// Create new user's account
 		User user = new User(username, email, encoder.encode(password));
-		Set<Role> roles = new HashSet<>();
+		Set<RolesType> rolesTypes = new HashSet<>();
 
 		if (strRoles == null) {
-			Role userRole = roleRepository.findByName(ERole.ROLE_USER).orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-			roles.add(userRole);
+			RolesType userRolesType = roleRepository.findByName(ERole.ROLE_USER).orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+			rolesTypes.add(userRolesType);
 		} else {
 			strRoles.forEach(role -> {
 				switch (role) {
 					case "admin":
-						Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
+						RolesType adminRolesType = roleRepository.findByName(ERole.ROLE_ADMIN)
 							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-						roles.add(adminRole);
+						rolesTypes.add(adminRolesType);
 						break;
 					case "mod":
-						Role modRole = roleRepository.findByName(ERole.ROLE_MODERATOR)
+						RolesType modRolesType = roleRepository.findByName(ERole.ROLE_MODERATOR)
 							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-						roles.add(modRole);
+						rolesTypes.add(modRolesType);
 						break;
 					default:
-						Role userRole = roleRepository.findByName(ERole.ROLE_USER)
+						RolesType userRolesType = roleRepository.findByName(ERole.ROLE_USER)
 							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-						roles.add(userRole);
+						rolesTypes.add(userRolesType);
 				}
 			});
 		}
 
-		user.setRoles(roles);
+		user.setRolesTypes(rolesTypes);
 		userRepository.save(user);
 	}
 
