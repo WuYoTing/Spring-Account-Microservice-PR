@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.example.springaccountmicroservicepr.pojo.response.MessageResponse;
 import com.example.springaccountmicroservicepr.pojo.vo.ProgressStatus;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -21,8 +22,9 @@ public class AuthenticationEntryPointException implements AuthenticationEntryPoi
 	public void commence(HttpServletRequest request, HttpServletResponse response,
 								AuthenticationException authException) throws IOException, ServletException {
 		log.error("Unauthorized error: {}", authException.getMessage());
+		String messageResp = new ObjectMapper().writeValueAsString(new MessageResponse(ProgressStatus.Error, "Error: Unauthorized"));
+		response.setContentType("application/json");
 		response.setStatus(response.SC_FORBIDDEN);
-		response.getWriter().write(String.valueOf(new MessageResponse(ProgressStatus.Error, "Error: Unauthorized")));
-		response.flushBuffer();
+		response.getWriter().write(messageResp);
 	}
 }
