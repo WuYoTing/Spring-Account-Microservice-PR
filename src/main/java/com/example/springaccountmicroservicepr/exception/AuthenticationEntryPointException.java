@@ -16,13 +16,11 @@ import org.springframework.stereotype.Component;
 @Log4j2
 @Component
 public class AuthenticationEntryPointException implements AuthenticationEntryPoint {
-
-
+	
 	@Override
-	public void commence(HttpServletRequest request, HttpServletResponse response,
-								AuthenticationException authException) throws IOException, ServletException {
+	public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
 		log.error("Unauthorized error: {}", authException.getMessage());
-		String messageResp = new ObjectMapper().writeValueAsString(new MessageResponse(ProgressStatus.Error, "Error: Unauthorized"));
+		String messageResp = new ObjectMapper().writeValueAsString(new MessageResponse(ProgressStatus.Error, authException.getMessage()));
 		response.setContentType("application/json");
 		response.setStatus(response.SC_FORBIDDEN);
 		response.getWriter().write(messageResp);
