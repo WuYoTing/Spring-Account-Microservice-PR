@@ -1,6 +1,5 @@
 package com.example.springaccountmicroservicepr.config;
 
-import com.example.springaccountmicroservicepr.exception.AuthenticationEntryPointException;
 import com.example.springaccountmicroservicepr.services.impl.UserDetailsServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +24,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	private UserDetailsServiceImpl userDetailsService;
 
-	private AuthenticationEntryPointException unauthorizedHandler;
+	private RestAuthenticationEntryPoint unauthorizedHandler;
 
 	@Bean
 	public AuthTokenFilter authenticationJwtTokenFilter() {

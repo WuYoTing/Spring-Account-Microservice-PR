@@ -27,34 +27,35 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/auth")
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 public class AuthController {
+
 	private JwtUtils jwtUtils;
 	private AuthenticateService authenticateService;
 
 	@PostMapping("/login")
-	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+	public ResponseEntity<JwtResponse> authenticateUser(
+		@Valid @RequestBody LoginRequest loginRequest) {
 		Authentication authentication = authenticateService.getUserAuthentication(
-			loginRequest.getUsername(), loginRequest.getPassword()
-		);
+			loginRequest.getUsername(), loginRequest.getPassword());
 
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 
 		String jwt = jwtUtils.generateJwtToken(authentication);
 		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-		List<String> roles = userDetails.getAuthorities().stream()
-			.map(item -> item.getAuthority())
+		List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
 			.collect(Collectors.toList());
-		return new ResponseEntity<>(new JwtResponse(
-			jwt,
-			userDetails.getId(),
-			userDetails.getUsername(),
-			userDetails.getEmail(),
-			roles), HttpStatus.OK);
+		return new ResponseEntity<>(
+			new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(),
+				userDetails.getEmail(), roles), HttpStatus.OK);
 	}
 
 	@PostMapping("/signup")
-	public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
-		authenticateService.signup(signUpRequest.getUsername(), signUpRequest.getEmail(), signUpRequest.getRole(), signUpRequest.getPassword());
-		return new ResponseEntity<>(new MessageResponse(ProgressStatus.Success, "User registered successfully!"), HttpStatus.OK);
+	public ResponseEntity<MessageResponse> registerUser(
+		@Valid @RequestBody SignupRequest signUpRequest) {
+		authenticateService.signup(signUpRequest.getUsername(), signUpRequest.getEmail(),
+			signUpRequest.getRole(), signUpRequest.getPassword());
+		return new ResponseEntity<>(
+			new MessageResponse(ProgressStatus.Success, "User registered successfully!"),
+			HttpStatus.OK);
 	}
 }
 
