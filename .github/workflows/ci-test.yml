@@ -17,31 +17,14 @@ jobs:
         distribution: [ 'adopt', 'zulu' ]
         version: [ '11' ]
     steps:
-      # Use preinstalled PostgreSQL
-      - name: Start PostgreSQL on Ubuntu
-        run: |
-          sudo systemctl start postgresql.service
-          pg_isready
-
-      # Change user name and password to meet your requirements
-      - name: Create additional user
-        run: |
-          sudo -u postgres psql --command="CREATE USER Tim PASSWORD 'Tim'" --command="\du"
-
-      # Change database name to meet your requirements
-      - name: Create additional database
-        run: |
-          sudo -u postgres createdb --owner=Tim account
-          PGPASSWORD=Tim psql --username=Tim --host=localhost --list timetable
-          
       - name: Checkout
         uses: actions/checkout@v2.4.0
-        
+
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
           java-version: ${{ matrix.version }}
           distribution: ${{ matrix.distribution }}
-          
+
       - name: Compile code
         run: mvn test
