@@ -33,18 +33,12 @@ jobs:
         run: |
           sudo -u postgres createdb --owner=Tim account
           PGPASSWORD=foo psql --username=Tim --host=localhost --list timetable
-
-      # Checkout data sourse
       - name: Checkout
         uses: actions/checkout@v2.4.0
-
-      # Checkout Java version
-      - name
+      - name: Set up JDK
         uses: actions/setup-java@v2
         with:
           java-version: ${{ matrix.version }}
           distribution: ${{ matrix.distribution }}
-
-      # Run Test
       - name: Compile code
         run: mvn test
