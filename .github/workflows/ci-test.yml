@@ -8,30 +8,30 @@ on:
 
 jobs:
   run-mvn-test:
-    name: ${{ matrix.distribution }} ${{ matrix.version }} (jdk-x64) - ${{ matrix.os }} - Test
-    runs-on: ${{ matrix.os }}
+
     strategy:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest ]
         distribution: [ 'adopt', 'zulu' ]
         version: [ '11' ]
-    steps:
-      # Use preinstalled PostgreSQL
-      - name: Start PostgreSQL on Ubuntu
-        run: |
-          sudo systemctl start postgresql.service
-          pg_isready
-      # Change user name and password to meet your requirements
-      - name: Create additional user
-        run: |
-          sudo -u postgres psql --command="CREATE USER tim PASSWORD 'tim'" --command="\du"
-      # Change database name to meet your requirements
-      - name: Create additional database
-        run: |
-          sudo -u postgres createdb --owner=Tim account
-          PGPASSWORD=tim psql --username=tim --host=localhost --list timetable
 
+    name: ${{ matrix.distribution }} ${{ matrix.version }} (jdk-x64) - ${{ matrix.os }} - Test
+
+    runs-on: ${{ matrix.os }}
+
+    services:
+      postgres:
+        image: postgres:11
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: account
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
       - name: Checkout
         uses: actions/checkout@v2.4.0
 
