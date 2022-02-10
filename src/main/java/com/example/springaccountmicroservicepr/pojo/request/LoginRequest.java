@@ -1,11 +1,10 @@
 package com.example.springaccountmicroservicepr.pojo.request;
 
 import javax.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
+import lombok.Data;
+
+@Data
 public class LoginRequest {
 
 	@NotBlank
