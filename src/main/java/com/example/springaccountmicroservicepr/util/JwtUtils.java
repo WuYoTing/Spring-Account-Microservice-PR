@@ -2,8 +2,10 @@ package com.example.springaccountmicroservicepr.util;
 
 import com.example.springaccountmicroservicepr.pojo.dto.UserDetailsImpl;
 import io.jsonwebtoken.*;
+
 import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
+
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -27,9 +29,16 @@ public class JwtUtils {
 
 		UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
 
-		return Jwts.builder().setSubject((userPrincipal.getUsername())).setIssuedAt(new Date())
+		return Jwts.builder()
+			.setSubject((userPrincipal.getUsername()))
+			.setIssuedAt(new Date())
 			.setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-			.signWith(SignatureAlgorithm.HS512, jwtSecret).compact();
+			.signWith(SignatureAlgorithm.HS512, jwtSecret)
+			.compact();
+	}
+
+	public String generateTokenFromUsername(String userName) {
+		return "123";
 	}
 
 	public String getUserNameFromJwtToken(String token) {

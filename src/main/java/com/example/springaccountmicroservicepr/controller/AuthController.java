@@ -3,6 +3,7 @@ package com.example.springaccountmicroservicepr.controller;
 import com.example.springaccountmicroservicepr.pojo.dto.UserDetailsImpl;
 import com.example.springaccountmicroservicepr.pojo.request.LoginRequest;
 import com.example.springaccountmicroservicepr.pojo.request.SignupRequest;
+import com.example.springaccountmicroservicepr.pojo.request.TokenRefreshRequest;
 import com.example.springaccountmicroservicepr.pojo.response.JwtResponse;
 import com.example.springaccountmicroservicepr.pojo.response.MessageResponse;
 import com.example.springaccountmicroservicepr.pojo.vo.ProgressStatus;
@@ -56,6 +57,20 @@ public class AuthController {
 		return new ResponseEntity<>(
 			new MessageResponse(ProgressStatus.Success, "User registered successfully!"),
 			HttpStatus.OK);
+	}
+
+	@PostMapping("/refreshtoken")
+	public ResponseEntity<?> refreshtoken(@Valid @RequestBody TokenRefreshRequest request) {
+		String requestRefreshToken = request.getRefreshToken();
+		return authenticateService.findByToken(requestRefreshToken)
+			.map(authenticateService::verifyExpiration)
+			.map(RefreshToken::getUser)
+			.map(user -> {
+				String token = jwtUtils.generateTokenFromUsername(user.getUsername());
+				return ResponseEntity.ok(new TokenRefreshResponse(token, requestRefreshToken));
+			})
+			.orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
+				"Refresh token is not in database!"));
 	}
 }
 
