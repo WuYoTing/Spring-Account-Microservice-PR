@@ -26,19 +26,16 @@ public class JwtUtils {
 	 * generate a JWT from username, date, expiration, secret
 	 */
 	public String generateJwtToken(Authentication authentication) {
-
 		UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
-
-		return Jwts.builder()
-			.setSubject((userPrincipal.getUsername()))
-			.setIssuedAt(new Date())
-			.setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-			.signWith(SignatureAlgorithm.HS512, jwtSecret)
-			.compact();
+		return generateTokenFromUsername(userPrincipal.getUsername());
 	}
 
 	public String generateTokenFromUsername(String userName) {
-		return "123";
+		return Jwts.builder()
+			.setSubject(userName)
+			.setIssuedAt(new Date())
+			.setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+			.signWith(SignatureAlgorithm.HS512, jwtSecret).compact();
 	}
 
 	public String getUserNameFromJwtToken(String token) {

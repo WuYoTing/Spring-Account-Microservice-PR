@@ -1,6 +1,5 @@
 package com.example.springaccountmicroservicepr.pojo.response;
 
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,12 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class JwtResponse {
+public class TokenRefreshResponse {
 
-	private String token;
+	private String accessToken;
 	private String refreshToken;
-	private Long id;
-	private String username;
-	private String email;
-	private List<String> roles;
 }

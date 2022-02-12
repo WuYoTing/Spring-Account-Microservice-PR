@@ -1,13 +1,17 @@
 package com.example.springaccountmicroservicepr.controller;
 
+import com.example.springaccountmicroservicepr.exception.TokenRefreshException;
+import com.example.springaccountmicroservicepr.pojo.dao.RefreshToken;
 import com.example.springaccountmicroservicepr.pojo.dto.UserDetailsImpl;
 import com.example.springaccountmicroservicepr.pojo.request.LoginRequest;
 import com.example.springaccountmicroservicepr.pojo.request.SignupRequest;
 import com.example.springaccountmicroservicepr.pojo.request.TokenRefreshRequest;
 import com.example.springaccountmicroservicepr.pojo.response.JwtResponse;
 import com.example.springaccountmicroservicepr.pojo.response.MessageResponse;
+import com.example.springaccountmicroservicepr.pojo.response.TokenRefreshResponse;
 import com.example.springaccountmicroservicepr.pojo.vo.ProgressStatus;
 import com.example.springaccountmicroservicepr.services.AuthenticateService;
+import com.example.springaccountmicroservicepr.services.RefreshTokenService;
 import com.example.springaccountmicroservicepr.util.JwtUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +35,7 @@ public class AuthController {
 
 	private JwtUtils jwtUtils;
 	private AuthenticateService authenticateService;
+	private RefreshTokenService refreshTokenService;
 
 	@PostMapping("/login")
 	public ResponseEntity<JwtResponse> authenticateUser(
@@ -44,9 +49,9 @@ public class AuthController {
 		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 		List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
 			.collect(Collectors.toList());
-		return new ResponseEntity<>(
-			new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(),
-				userDetails.getEmail(), roles), HttpStatus.OK);
+		RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
+		return new ResponseEntity<>(new JwtResponse(jwt, refreshToken.getToken(), userDetails.getId(),
+			userDetails.getUsername(), userDetails.getEmail(), roles), HttpStatus.OK);
 	}
 
 	@PostMapping("/signup")
@@ -59,11 +64,21 @@ public class AuthController {
 			HttpStatus.OK);
 	}
 
-	// refresh
-	// remove
-	// changePassword
-	// resetPassword
-	// getUserByToken
-	// validateToken
+	@PostMapping("/refreshtoken")
+	public ResponseEntity<?> refreshtoken(@Valid @RequestBody TokenRefreshRequest request) {
+		String requestRefreshToken = request.getRefreshToken();
+		return refreshTokenService.findByToken(requestRefreshToken)
+			.map(refreshTokenService::verifyExpiration).map(RefreshToken::getUser).map(user -> {
+				String token = jwtUtils.generateTokenFromUsername(user.getUsername());
+				return ResponseEntity.ok(new TokenRefreshResponse(token, requestRefreshToken));
+			}).orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
+				"Refresh token is not in database!"));
+	}
+
+	// Todo add remove api
+	// Todo add changePassword api
+	// Todo add resetPassword api
+	// Todo add getUserByToken api
+	// Todo add validateToken api
 }
 

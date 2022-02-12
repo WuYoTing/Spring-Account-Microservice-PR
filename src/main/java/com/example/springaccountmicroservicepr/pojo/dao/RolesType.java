@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -14,11 +15,9 @@ public class RolesType {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Getter
 	private Integer id;
 
 	@Enumerated(EnumType.STRING)
 	@Column(length = 20)
-	@Getter
 	private ERole name;
 }
