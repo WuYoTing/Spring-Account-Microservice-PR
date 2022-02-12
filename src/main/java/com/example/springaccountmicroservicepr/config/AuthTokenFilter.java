@@ -1,6 +1,6 @@
 package com.example.springaccountmicroservicepr.config;
 
-import com.example.springaccountmicroservicepr.services.impl.UserDetailsServiceImpl;
+import com.example.springaccountmicroservicepr.services.AuthenticateService;
 import com.example.springaccountmicroservicepr.util.JwtUtils;
 
 import java.io.IOException;
@@ -24,7 +24,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 	@Autowired
 	private JwtUtils jwtUtils;
 	@Autowired
-	private UserDetailsServiceImpl userDetailsService;
+	private AuthenticateService authenticateService;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -34,7 +34,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 			if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
 				String username = jwtUtils.getUserNameFromJwtToken(jwt);
 
-				UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+				UserDetails userDetails = authenticateService.loadUserByUsername(username);
 				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
 					userDetails, null, userDetails.getAuthorities());
 				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
