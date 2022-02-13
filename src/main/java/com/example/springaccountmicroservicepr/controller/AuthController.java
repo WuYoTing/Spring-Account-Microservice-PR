@@ -65,12 +65,14 @@ public class AuthController {
 	}
 
 	@PostMapping("/refreshtoken")
-	public ResponseEntity<?> refreshtoken(@Valid @RequestBody TokenRefreshRequest request) {
+	public ResponseEntity<TokenRefreshResponse> refreshtoken(
+		@Valid @RequestBody TokenRefreshRequest request) {
 		String requestRefreshToken = request.getRefreshToken();
 		return refreshTokenService.findByToken(requestRefreshToken)
 			.map(refreshTokenService::verifyExpiration).map(RefreshToken::getUser).map(user -> {
 				String token = jwtUtils.generateTokenFromUsername(user.getUsername());
-				return ResponseEntity.ok(new TokenRefreshResponse(token, requestRefreshToken));
+				return new ResponseEntity<>(new TokenRefreshResponse(token, requestRefreshToken),
+					HttpStatus.OK);
 			}).orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
 				"Refresh token is not in database!"));
 	}

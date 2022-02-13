@@ -35,8 +35,13 @@ public class RefreshTokenService {
 	}
 
 	public RefreshToken createRefreshToken(Long userId) {
-		return new RefreshToken(userRepository.findById(userId).get(), UUID.randomUUID().toString(),
-			Instant.now().plusMillis(jwtRefreshExpirationMs));
+		RefreshToken refreshToken = new RefreshToken(
+			userRepository.findById(userId).get(),
+			UUID.randomUUID().toString(),
+			Instant.now().plusMillis(jwtRefreshExpirationMs)
+		);
+		refreshToken = refreshTokenRepository.save(refreshToken);
+		return refreshToken;
 	}
 
 	public RefreshToken verifyExpiration(RefreshToken token) {

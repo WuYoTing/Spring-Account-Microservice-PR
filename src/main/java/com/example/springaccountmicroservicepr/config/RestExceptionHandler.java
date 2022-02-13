@@ -1,5 +1,6 @@
 package com.example.springaccountmicroservicepr.config;
 
+import com.example.springaccountmicroservicepr.exception.TokenRefreshException;
 import com.example.springaccountmicroservicepr.pojo.response.MessageResponse;
 import com.example.springaccountmicroservicepr.pojo.vo.ProgressStatus;
 import lombok.extern.log4j.Log4j2;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.List;
+import org.springframework.web.context.request.WebRequest;
 
 @Log4j2
 @RestControllerAdvice
@@ -39,13 +41,19 @@ public class RestExceptionHandler {
 				FieldError fieldError = (FieldError) errors.get(0);
 				return new ResponseEntity<>(
 					new MessageResponse(ProgressStatus.Fail, fieldError.getDefaultMessage()),
-					HttpStatus.FORBIDDEN
-				);
+					HttpStatus.FORBIDDEN);
 			}
 		}
 		return new ResponseEntity<>(
 			new MessageResponse(ProgressStatus.Fail, "MethodArgumentNotValidException"),
-			HttpStatus.FORBIDDEN
-		);
+			HttpStatus.FORBIDDEN);
+	}
+
+	@ExceptionHandler(value = TokenRefreshException.class)
+	@ResponseStatus(HttpStatus.FORBIDDEN)
+	public ResponseEntity<MessageResponse> handleTokenRefreshException(TokenRefreshException ex,
+		WebRequest request) {
+		return new ResponseEntity<>(new MessageResponse(ProgressStatus.Fail, ex.getMessage()),
+			HttpStatus.FORBIDDEN);
 	}
 }
