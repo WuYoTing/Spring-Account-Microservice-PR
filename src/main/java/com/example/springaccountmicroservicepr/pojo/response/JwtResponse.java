@@ -10,6 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class JwtResponse {
 
+	private String type = "Bearer";
 	private String token;
 	private String refreshToken;
 	private Long id;
