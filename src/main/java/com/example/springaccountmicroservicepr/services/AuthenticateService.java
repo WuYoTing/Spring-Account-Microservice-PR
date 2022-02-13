@@ -3,30 +3,24 @@ package com.example.springaccountmicroservicepr.services;
 
 import com.example.springaccountmicroservicepr.pojo.dao.RolesType;
 import com.example.springaccountmicroservicepr.pojo.dao.User;
-import com.example.springaccountmicroservicepr.pojo.dto.UserDetailsImpl;
 import com.example.springaccountmicroservicepr.pojo.vo.ERole;
 import com.example.springaccountmicroservicepr.repository.RoleRepository;
 import com.example.springaccountmicroservicepr.repository.UserRepository;
-import javax.transaction.Transactional;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.HashSet;
-import java.util.Set;
 
 @Log4j2
 @Service
 @AllArgsConstructor(onConstructor = @__(@Autowired))
-public class AuthenticateService implements UserDetailsService {
+public class AuthenticateService {
 
 	UserRepository userRepository;
 	RoleRepository roleRepository;
@@ -83,11 +77,4 @@ public class AuthenticateService implements UserDetailsService {
 	}
 
 
-	@Override
-	@Transactional
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		User user = userRepository.findByUsername(username).orElseThrow(
-			() -> new UsernameNotFoundException("User Not Found with username: " + username));
-		return UserDetailsImpl.build(user);
-	}
 }

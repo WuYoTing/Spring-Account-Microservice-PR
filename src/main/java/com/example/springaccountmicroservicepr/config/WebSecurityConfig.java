@@ -1,6 +1,7 @@
 package com.example.springaccountmicroservicepr.config;
 
 import com.example.springaccountmicroservicepr.services.AuthenticateService;
+import com.example.springaccountmicroservicepr.services.impl.UserDetailsServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -22,7 +23,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-	private AuthenticateService authenticateService;
+	private UserDetailsServiceImpl userDetailsService;
 
 	private RestAuthenticationEntryPoint unauthorizedHandler;
 
@@ -49,7 +50,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	public void configure(AuthenticationManagerBuilder authenticationManagerBuilder)
 		throws Exception {
-		authenticationManagerBuilder.userDetailsService(authenticateService)
+		authenticationManagerBuilder.userDetailsService(userDetailsService)
 			.passwordEncoder(passwordEncoder());
 	}
 

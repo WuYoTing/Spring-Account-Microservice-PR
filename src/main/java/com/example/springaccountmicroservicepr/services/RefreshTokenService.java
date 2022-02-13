@@ -8,7 +8,6 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 import javax.transaction.Transactional;
-import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,13 +15,20 @@ import org.springframework.stereotype.Service;
 
 @Log4j2
 @Service
-@AllArgsConstructor(onConstructor = @__(@Autowired))
 public class RefreshTokenService {
 
-	@Value("${account.service.jwtExpirationMs}")
+	@Value("${account.service.jwtRefreshExpirationMs}")
 	private int jwtRefreshExpirationMs;
 	private RefreshTokenRepository refreshTokenRepository;
 	private UserRepository userRepository;
+
+	@Autowired
+	public RefreshTokenService(RefreshTokenRepository refreshTokenRepository,
+		UserRepository userRepository) {
+		this.refreshTokenRepository = refreshTokenRepository;
+		this.userRepository = userRepository;
+	}
+
 
 	public Optional<RefreshToken> findByToken(String token) {
 		return refreshTokenRepository.findByToken(token);
