@@ -11,10 +11,10 @@ CREATE TABLE public.users
 
 CREATE TABLE public.user_roles
 (
-  user_id int8 NOT NULL,
-  role_id int4 NOT NULL,
-  CONSTRAINT user_roles_pkey PRIMARY KEY (user_id, role_id),
-  CONSTRAINT fkfdhtmw4ohw7ra8mlu78axpuye FOREIGN KEY (role_id) REFERENCES public.roles_type (id),
+  user_id      int8 NOT NULL,
+  role_type_id int4 NOT NULL,
+  CONSTRAINT user_roles_pkey PRIMARY KEY (user_id, role_type_id),
+  CONSTRAINT fkfdhtmw4ohw7ra8mlu78axpuye FOREIGN KEY (role_type_id) REFERENCES public.roles_type (id),
   CONSTRAINT fkhfh9dx7w3ubf1co1vdev94g3f FOREIGN KEY (user_id) REFERENCES public.users (id)
 );
 
