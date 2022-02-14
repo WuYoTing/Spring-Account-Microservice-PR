@@ -32,7 +32,7 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
-      - name: Checkout
+      - name: Checkout Sourse Code
         uses: actions/checkout@v2.4.0
 
       - name: Set up JDK
@@ -41,5 +41,5 @@ jobs:
           java-version: ${{ matrix.version }}
           distribution: ${{ matrix.distribution }}
 
-      - name: Compile code
-        run: mvn test
+      - name: Mvn Test
+        run: mvn test -Dspring.profiles.active=test
