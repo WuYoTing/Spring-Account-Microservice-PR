@@ -1,6 +1,5 @@
 package com.example.springaccountmicroservicepr.config;
 
-import com.example.springaccountmicroservicepr.services.AuthenticateService;
 import com.example.springaccountmicroservicepr.services.impl.UserDetailsServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +21,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+	private static final String[] AUTH_WHITELIST = {
+		"/authenticate",
+		"/swagger-resources/**",
+		"/swagger-ui/**",
+		"/v3/api-docs/**",
+		"/webjars/**",
+		"/api/auth/**",
+		"/api/test/**"
+	};
 
 	private UserDetailsServiceImpl userDetailsService;
 
@@ -60,17 +69,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	 */
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.cors().and().csrf().disable().exceptionHandling()
-			.authenticationEntryPoint(unauthorizedHandler).and().sessionManagement()
-			.sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().authorizeRequests()
+		http.cors().and()
+			.csrf().disable()
+			// configure exception handling
+			.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+			// configure session create way(always,ifRequired,never,stateless)
+			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
 			// permitAll do not need to auth
-			.antMatchers("/api/auth/**").permitAll()
-			.antMatchers("/api/test/**").permitAll()
+			.authorizeRequests()
+			.antMatchers(AUTH_WHITELIST).permitAll()
 			// other need to auth
 			.anyRequest().authenticated();
 
 		http.addFilterBefore(authenticationJwtTokenFilter(),
 			UsernamePasswordAuthenticationFilter.class);
 	}
-
 }

@@ -15,10 +15,14 @@ This project is a simple practice about Spring Boot &amp; Spring Security
 
 ---
 application.properties
-```
 
 ```
 
-
+```
 
 ## Result
+
+## Feature
+
+1. Add H2 DB for Test
+2. Add Unit Test
