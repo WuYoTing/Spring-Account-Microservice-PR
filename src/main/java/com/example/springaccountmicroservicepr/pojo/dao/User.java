@@ -32,12 +32,12 @@ public class User {
 	@Size(max = 120)
 	private String password;
 
-	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-	private Set<RolesType> rolesTypes = new HashSet<>();
-
 	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
 	private RefreshToken refreshToken;
+
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_type_id"))
+	private Set<RolesType> rolesTypes = new HashSet<>();
 
 	public User(String username, String email, String password) {
 		this.username = username;

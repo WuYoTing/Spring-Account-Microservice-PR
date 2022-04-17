@@ -2,8 +2,8 @@ package com.example.springaccountmicroservicepr.services;
 
 import com.example.springaccountmicroservicepr.exception.TokenRefreshException;
 import com.example.springaccountmicroservicepr.pojo.dao.RefreshToken;
-import com.example.springaccountmicroservicepr.repository.RefreshTokenRepository;
-import com.example.springaccountmicroservicepr.repository.UserRepository;
+import com.example.springaccountmicroservicepr.services.repository.RefreshTokenRepository;
+import com.example.springaccountmicroservicepr.services.repository.UserRepository;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;

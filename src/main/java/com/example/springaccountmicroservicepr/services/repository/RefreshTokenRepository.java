@@ -1,4 +1,4 @@
-package com.example.springaccountmicroservicepr.repository;
+package com.example.springaccountmicroservicepr.services.repository;
 
 import com.example.springaccountmicroservicepr.pojo.dao.RefreshToken;
 import com.example.springaccountmicroservicepr.pojo.dao.User;

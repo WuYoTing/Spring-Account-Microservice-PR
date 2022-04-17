@@ -1,5 +1,6 @@
 package com.example.springaccountmicroservicepr.config;
 
+import com.example.springaccountmicroservicepr.exception.NotFoundException;
 import com.example.springaccountmicroservicepr.exception.TokenRefreshException;
 import com.example.springaccountmicroservicepr.pojo.response.MessageResponse;
 import com.example.springaccountmicroservicepr.pojo.vo.ProgressStatus;
@@ -56,4 +57,19 @@ public class RestExceptionHandler {
 		return new ResponseEntity<>(new MessageResponse(ProgressStatus.Fail, ex.getMessage()),
 			HttpStatus.FORBIDDEN);
 	}
+
+	/**
+	 * 處理資源找不到異常
+	 *
+	 * @param e
+	 * @return
+	 */
+	@ExceptionHandler(NotFoundException.class)
+	@ResponseBody
+	public ResponseEntity<MessageResponse> handleNofFound(RuntimeException e) {
+		return new ResponseEntity<>(
+			new MessageResponse(ProgressStatus.Error, e.getMessage()),
+			HttpStatus.NOT_FOUND);
+	}
+
 }

@@ -2,7 +2,7 @@ package com.example.springaccountmicroservicepr.services.impl;
 
 import com.example.springaccountmicroservicepr.pojo.dao.User;
 import com.example.springaccountmicroservicepr.pojo.dto.UserDetailsImpl;
-import com.example.springaccountmicroservicepr.repository.UserRepository;
+import com.example.springaccountmicroservicepr.services.repository.UserRepository;
 import javax.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;

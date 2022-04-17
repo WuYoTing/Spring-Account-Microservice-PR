@@ -1,11 +1,12 @@
 package com.example.springaccountmicroservicepr.services;
 
 
+import com.example.springaccountmicroservicepr.exception.NotFoundException;
 import com.example.springaccountmicroservicepr.pojo.dao.RolesType;
 import com.example.springaccountmicroservicepr.pojo.dao.User;
 import com.example.springaccountmicroservicepr.pojo.vo.ERole;
-import com.example.springaccountmicroservicepr.repository.RoleRepository;
-import com.example.springaccountmicroservicepr.repository.UserRepository;
+import com.example.springaccountmicroservicepr.services.repository.RoleRepository;
+import com.example.springaccountmicroservicepr.services.repository.UserRepository;
 import java.util.HashSet;
 import java.util.Set;
 import lombok.AllArgsConstructor;
@@ -35,12 +36,12 @@ public class AuthenticateService {
 	public void signup(String username, String email, Set<String> strRoles, String password) {
 		if (userRepository.existsByUsername(username)) {
 			log.error("Error: Username is already taken! ");
-			throw new RuntimeException("Error: Username is already taken!");
+			throw new NotFoundException("Username is already taken!");
 		}
 
 		if (userRepository.existsByEmail(email)) {
 			log.error("Error: Email is already in use!");
-			throw new RuntimeException("Error: Email is already in use!");
+			throw new NotFoundException("Email is already in use!");
 		}
 
 		// Create new user's account
@@ -49,7 +50,7 @@ public class AuthenticateService {
 
 		if (strRoles == null) {
 			RolesType userRolesType = roleRepository.findByName(ERole.ROLE_USER)
-				.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+				.orElseThrow(() -> new NotFoundException("Role is not found."));
 			rolesTypes.add(userRolesType);
 		} else {
 			strRoles.forEach(role -> {

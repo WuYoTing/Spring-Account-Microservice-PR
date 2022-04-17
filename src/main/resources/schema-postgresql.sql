@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS public.users
+CREATE TABLE IF NOT EXISTS users
 (
   id         bigserial    NOT NULL,
   email      varchar(255) NULL,
@@ -9,14 +9,14 @@ CREATE TABLE IF NOT EXISTS public.users
   CONSTRAINT users_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE IF NOT EXISTS public.roles_type
+CREATE TABLE IF NOT EXISTS roles_type
 (
   id     serial4     NOT NULL,
   "name" varchar(20) NULL,
   CONSTRAINT roles_type_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE IF NOT EXISTS public.user_roles
+CREATE TABLE IF NOT EXISTS user_roles
 (
   user_id      int8 NOT NULL,
   role_type_id int4 NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS public.user_roles
   CONSTRAINT fkhfh9dx7w3ubf1co1vdev94g3f FOREIGN KEY (user_id) REFERENCES public.users (id)
 );
 
-CREATE TABLE IF NOT EXISTS public.refresh_token
+CREATE TABLE IF NOT EXISTS refresh_token
 (
   id          int8         NOT NULL,
   expiry_date timestamp    NOT NULL,
