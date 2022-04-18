@@ -24,6 +24,9 @@ import org.springframework.web.context.request.WebRequest;
 @RestControllerAdvice
 public class RestExceptionHandler {
 
+	/**
+	 * Handle Access Deny
+	 */
 	@ResponseBody
 	@ExceptionHandler(AccessDeniedException.class)
 	public ResponseEntity<MessageResponse> handleAccessDeniedException(Exception ex) {
@@ -32,6 +35,9 @@ public class RestExceptionHandler {
 		return new ResponseEntity<>(messageResp, HttpStatus.FORBIDDEN);
 	}
 
+	/**
+	 * Handle Validation Fail
+	 */
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler({MethodArgumentNotValidException.class})
 	public ResponseEntity<MessageResponse> paramExceptionHandler(MethodArgumentNotValidException e) {
@@ -46,10 +52,13 @@ public class RestExceptionHandler {
 			}
 		}
 		return new ResponseEntity<>(
-			new MessageResponse(ProgressStatus.Fail, "MethodArgumentNotValidException"),
+			new MessageResponse(ProgressStatus.Fail, "Request Parameter Error"),
 			HttpStatus.FORBIDDEN);
 	}
 
+	/**
+	 * Handle Token Expired
+	 */
 	@ExceptionHandler(value = TokenRefreshException.class)
 	@ResponseStatus(HttpStatus.FORBIDDEN)
 	public ResponseEntity<MessageResponse> handleTokenRefreshException(TokenRefreshException ex,
@@ -59,10 +68,7 @@ public class RestExceptionHandler {
 	}
 
 	/**
-	 * 處理資源找不到異常
-	 *
-	 * @param e
-	 * @return
+	 * Handle Resourses Not Found
 	 */
 	@ExceptionHandler(NotFoundException.class)
 	@ResponseBody
