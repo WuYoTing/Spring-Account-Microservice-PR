@@ -7,7 +7,9 @@ import com.example.springaccountmicroservicepr.pojo.dao.User;
 import com.example.springaccountmicroservicepr.pojo.vo.ERole;
 import com.example.springaccountmicroservicepr.services.repository.RoleRepository;
 import com.example.springaccountmicroservicepr.services.repository.UserRepository;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -30,10 +32,11 @@ public class AuthenticateService {
 
 	public Authentication getUserAuthentication(String username, String password) {
 		return authenticationManager.authenticate(
-			new UsernamePasswordAuthenticationToken(username, password));
+			new UsernamePasswordAuthenticationToken(username, password)
+		);
 	}
 
-	public void signup(String username, String email, Set<String> strRoles, String password) {
+	public User signup(String username, String email, Set<String> strRoles, String password) {
 		if (userRepository.existsByUsername(username)) {
 			log.error("Error: Username is already taken! ");
 			throw new NotFoundException("Username is already taken!");
@@ -46,7 +49,7 @@ public class AuthenticateService {
 
 		// Create new user's account
 		User user = new User(username, email, encoder.encode(password));
-		Set<RolesType> rolesTypes = new HashSet<>();
+		List<RolesType> rolesTypes = new ArrayList<>();
 
 		if (strRoles == null) {
 			RolesType userRolesType = roleRepository.findByName(ERole.ROLE_USER)
@@ -74,7 +77,7 @@ public class AuthenticateService {
 		}
 
 		user.setRolesTypes(rolesTypes);
-		userRepository.save(user);
+		return userRepository.save(user);
 	}
 
 
