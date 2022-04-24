@@ -18,7 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.ResultActions;
@@ -26,6 +26,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 
+@SpringBootTest
 @Import(SpringSecurityWebAuthTestConfig.class)
 @DisplayName("AuthControllerTest")
 @AutoConfigureMockMvc
@@ -45,6 +46,7 @@ class AuthControllerTest {
 	class test_registerUser {
 
 		@Test
+		@WithAnonymousUser
 		@DisplayName("sentMSG_should_be_ok")
 		public void registerUser_should_be_ok() throws Exception {
 			// Arrange
@@ -57,16 +59,38 @@ class AuthControllerTest {
 			signupRequest.setPassword("TestCase");
 			signupRequest.setRole(Collections.singleton("mod"));
 
-			RequestBuilder requestBuilder =
-				MockMvcRequestBuilders
-					.post("/api/auth/signup")
-					.headers(httpHeaders)
-					.content(objectMapper.writeValueAsString(signupRequest));
+			RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/auth/signup")
+				.headers(httpHeaders).content(objectMapper.writeValueAsString(signupRequest));
 			// Act
 			ResultActions resultActions = mockMvc.perform(requestBuilder);
 			// Assert
-			resultActions
-				.andExpect(status().isOk());
+			resultActions.andExpect(status().isOk());
+		}
+	}
+
+
+	@Nested
+	@DisplayName("login")
+	class test_login {
+
+		@Test
+		@WithAnonymousUser
+		@DisplayName("login_should_be_ok")
+		public void login_should_be_ok() throws Exception {
+			// Arrange
+			HttpHeaders httpHeaders = new HttpHeaders();
+			httpHeaders.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+
+			LoginRequest loginRequest = new LoginRequest();
+			loginRequest.setUsername("test");
+			loginRequest.setPassword("test");
+
+			RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/auth/login")
+				.headers(httpHeaders).content(objectMapper.writeValueAsString(loginRequest));
+			// Act
+			ResultActions resultActions = mockMvc.perform(requestBuilder);
+			// Assert
+			resultActions.andDo(MockMvcResultHandlers.print()).andExpect(status().isOk());
 		}
 	}
 }
