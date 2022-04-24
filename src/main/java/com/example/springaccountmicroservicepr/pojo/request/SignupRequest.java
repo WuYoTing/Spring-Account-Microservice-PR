@@ -1,11 +1,11 @@
 package com.example.springaccountmicroservicepr.pojo.request;
 
+import com.example.springaccountmicroservicepr.util.PatternsUtil;
 import java.util.Set;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-
 import lombok.Data;
 
 @Data
@@ -19,7 +19,7 @@ public class SignupRequest {
 	// Todo Make Email Check more complex
 	@NotBlank(message = "email is required")
 	@Size(max = 50, message = "invalid email size")
-	@Pattern(regexp = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$", message = "invalid email")
+	@Pattern(regexp = PatternsUtil.emailPattern, message = "invalid email")
 	private String email;
 
 	@NotEmpty(message = "role should not by empty")

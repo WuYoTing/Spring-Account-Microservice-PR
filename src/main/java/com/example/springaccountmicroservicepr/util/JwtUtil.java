@@ -14,7 +14,7 @@ import org.springframework.util.StringUtils;
 
 @Log4j2
 @Component
-public class JwtUtils {
+public class JwtUtil {
 
 	@Value("${account.service.jwtSecret}")
 	private String jwtSecret;

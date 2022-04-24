@@ -1,7 +1,9 @@
 package com.example.springaccountmicroservicepr.services;
 
+import com.example.springaccountmicroservicepr.exception.NotFoundException;
 import com.example.springaccountmicroservicepr.exception.TokenRefreshException;
 import com.example.springaccountmicroservicepr.pojo.dao.RefreshToken;
+import com.example.springaccountmicroservicepr.pojo.dao.User;
 import com.example.springaccountmicroservicepr.services.repository.RefreshTokenRepository;
 import com.example.springaccountmicroservicepr.services.repository.UserRepository;
 import java.time.Instant;
@@ -35,8 +37,13 @@ public class RefreshTokenService {
 	}
 
 	public RefreshToken createRefreshToken(Long userId) {
+		Optional<User> userOptional = userRepository.findById(userId);
+		if (!userOptional.isPresent()) {
+			log.error("Error: Username Not Exist");
+			throw new NotFoundException("Username Not Exist!");
+		}
 		RefreshToken refreshToken = new RefreshToken(
-			userRepository.findById(userId).get(),
+			userOptional.get(),
 			UUID.randomUUID().toString(),
 			Instant.now().plusMillis(jwtRefreshExpirationMs)
 		);
@@ -55,6 +62,11 @@ public class RefreshTokenService {
 
 	@Transactional
 	public int deleteByUserId(Long userId) {
-		return refreshTokenRepository.deleteByUser(userRepository.findById(userId).get());
+		Optional<User> userOptional = userRepository.findById(userId);
+		if (!userOptional.isPresent()) {
+			log.error("Error: Username Not Exist");
+			throw new NotFoundException("Username Not Exist!");
+		}
+		return refreshTokenRepository.deleteByUser(userOptional.get());
 	}
 }

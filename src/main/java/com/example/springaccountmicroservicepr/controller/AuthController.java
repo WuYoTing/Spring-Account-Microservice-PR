@@ -12,7 +12,7 @@ import com.example.springaccountmicroservicepr.pojo.response.TokenRefreshRespons
 import com.example.springaccountmicroservicepr.pojo.vo.ProgressStatus;
 import com.example.springaccountmicroservicepr.services.AuthenticateService;
 import com.example.springaccountmicroservicepr.services.RefreshTokenService;
-import com.example.springaccountmicroservicepr.util.JwtUtils;
+import com.example.springaccountmicroservicepr.util.JwtUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 public class AuthController {
 
-	private JwtUtils jwtUtils;
+	private JwtUtil jwtUtil;
 	private AuthenticateService authenticateService;
 	private RefreshTokenService refreshTokenService;
 
@@ -45,7 +45,7 @@ public class AuthController {
 
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 
-		String jwt = jwtUtils.generateJwtToken(authentication);
+		String jwt = jwtUtil.generateJwtToken(authentication);
 		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 		List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
 			.collect(Collectors.toList());
@@ -69,11 +69,14 @@ public class AuthController {
 		@Valid @RequestBody TokenRefreshRequest request) {
 		String requestRefreshToken = request.getRefreshToken();
 		return refreshTokenService.findByToken(requestRefreshToken)
-			.map(refreshTokenService::verifyExpiration).map(RefreshToken::getUser).map(user -> {
-				String token = jwtUtils.generateTokenFromUsername(user.getUsername());
+			.map(refreshTokenService::verifyExpiration)
+			.map(RefreshToken::getUser)
+			.map(user -> {
+				String token = jwtUtil.generateTokenFromUsername(user.getUsername());
 				return new ResponseEntity<>(new TokenRefreshResponse(token, requestRefreshToken),
 					HttpStatus.OK);
-			}).orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
+			})
+			.orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
 				"Refresh token is not in database!"));
 	}
 
