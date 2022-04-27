@@ -2,8 +2,10 @@ package com.example.springaccountmicroservicepr.services;
 
 import com.example.springaccountmicroservicepr.exception.NotFoundException;
 import com.example.springaccountmicroservicepr.exception.TokenRefreshException;
+import com.example.springaccountmicroservicepr.pojo.dao.PasswordResetToken;
 import com.example.springaccountmicroservicepr.pojo.dao.RefreshToken;
 import com.example.springaccountmicroservicepr.pojo.dao.User;
+import com.example.springaccountmicroservicepr.services.repository.PasswordResetTokenRepository;
 import com.example.springaccountmicroservicepr.services.repository.RefreshTokenRepository;
 import com.example.springaccountmicroservicepr.services.repository.UserRepository;
 import java.time.Instant;
@@ -17,15 +19,20 @@ import org.springframework.stereotype.Service;
 
 @Log4j2
 @Service
-public class RefreshTokenService {
+public class TokenService {
 
 	@Value("${account.service.jwtRefreshExpirationMs}")
 	private int jwtRefreshExpirationMs;
-	private RefreshTokenRepository refreshTokenRepository;
+
+	@Value("${account.service.passwordResetTokenExpirationMs}")
+	private int passwordResetTokenExpirationMs;
+
 	private UserRepository userRepository;
+	private RefreshTokenRepository refreshTokenRepository;
+	private PasswordResetTokenRepository passwordResetTokenRepository;
 
 	@Autowired
-	public RefreshTokenService(RefreshTokenRepository refreshTokenRepository,
+	public TokenService(RefreshTokenRepository refreshTokenRepository,
 		UserRepository userRepository) {
 		this.refreshTokenRepository = refreshTokenRepository;
 		this.userRepository = userRepository;
@@ -42,11 +49,8 @@ public class RefreshTokenService {
 			log.error("Error: Username Not Exist");
 			throw new NotFoundException("Username Not Exist!");
 		}
-		RefreshToken refreshToken = new RefreshToken(
-			userOptional.get(),
-			UUID.randomUUID().toString(),
-			Instant.now().plusMillis(jwtRefreshExpirationMs)
-		);
+		RefreshToken refreshToken = new RefreshToken(userOptional.get(), UUID.randomUUID().toString(),
+			Instant.now().plusMillis(jwtRefreshExpirationMs));
 		refreshToken = refreshTokenRepository.save(refreshToken);
 		return refreshToken;
 	}
@@ -68,5 +72,17 @@ public class RefreshTokenService {
 			throw new NotFoundException("Username Not Exist!");
 		}
 		return refreshTokenRepository.deleteByUser(userOptional.get());
+	}
+
+
+	public PasswordResetToken passwordForget(String email) {
+		User user = userRepository.findByEmail(email)
+			.orElseThrow(() -> new NotFoundException("Username Not Exist!"));
+		String uuid = UUID.randomUUID().toString();
+		PasswordResetToken passwordResetToken = new PasswordResetToken(user, uuid,
+			Instant.now().plusMillis(passwordResetTokenExpirationMs)
+		);
+		passwordResetToken = passwordResetTokenRepository.save(passwordResetToken);
+		return passwordResetToken;
 	}
 }

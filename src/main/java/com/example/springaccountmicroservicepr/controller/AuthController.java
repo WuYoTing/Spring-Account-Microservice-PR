@@ -1,6 +1,7 @@
 package com.example.springaccountmicroservicepr.controller;
 
 import com.example.springaccountmicroservicepr.exception.TokenRefreshException;
+import com.example.springaccountmicroservicepr.pojo.dao.PasswordResetToken;
 import com.example.springaccountmicroservicepr.pojo.dao.RefreshToken;
 import com.example.springaccountmicroservicepr.pojo.dto.UserDetailsImpl;
 import com.example.springaccountmicroservicepr.pojo.request.LoginRequest;
@@ -11,17 +12,23 @@ import com.example.springaccountmicroservicepr.pojo.response.MessageResponse;
 import com.example.springaccountmicroservicepr.pojo.response.TokenRefreshResponse;
 import com.example.springaccountmicroservicepr.pojo.vo.ProgressStatus;
 import com.example.springaccountmicroservicepr.services.AuthenticateService;
-import com.example.springaccountmicroservicepr.services.RefreshTokenService;
+import com.example.springaccountmicroservicepr.services.TokenService;
 import com.example.springaccountmicroservicepr.util.JwtUtil;
+import com.example.springaccountmicroservicepr.util.PatternsUtil;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -35,7 +42,7 @@ public class AuthController {
 
 	private JwtUtil jwtUtil;
 	private AuthenticateService authenticateService;
-	private RefreshTokenService refreshTokenService;
+	private TokenService tokenService;
 
 	@PostMapping("/login")
 	public ResponseEntity<JwtResponse> authenticateUser(
@@ -49,7 +56,7 @@ public class AuthController {
 		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 		List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
 			.collect(Collectors.toList());
-		RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
+		RefreshToken refreshToken = tokenService.createRefreshToken(userDetails.getId());
 		return new ResponseEntity<>(new JwtResponse(jwt, refreshToken.getToken(), userDetails.getId(),
 			userDetails.getUsername(), userDetails.getEmail(), roles), HttpStatus.OK);
 	}
@@ -68,8 +75,8 @@ public class AuthController {
 	public ResponseEntity<TokenRefreshResponse> refreshtoken(
 		@Valid @RequestBody TokenRefreshRequest request) {
 		String requestRefreshToken = request.getRefreshToken();
-		return refreshTokenService.findByToken(requestRefreshToken)
-			.map(refreshTokenService::verifyExpiration)
+		return tokenService.findByToken(requestRefreshToken)
+			.map(tokenService::verifyExpiration)
 			.map(RefreshToken::getUser)
 			.map(user -> {
 				String token = jwtUtil.generateTokenFromUsername(user.getUsername());
@@ -80,9 +87,17 @@ public class AuthController {
 				"Refresh token is not in database!"));
 	}
 
-	// Todo add remove api
-	// Todo add changePassword api
-	// Todo add resetPassword api
+	@GetMapping("/password/forget")
+	public ResponseEntity<MessageResponse> passwordForget(
+		@RequestParam @NotBlank(message = "email is required") @Size(max = 50, message = "invalid email size") @Pattern(regexp = PatternsUtil.emailPattern, message = "invalid email") String email) {
+		PasswordResetToken passwordResetToken = tokenService.passwordForget(email);
+		// Todo Send mail notify with uuid
+		return new ResponseEntity<>(
+			new MessageResponse(ProgressStatus.Success, "User registered successfully!"),
+			HttpStatus.OK);
+	}
+
+	// Todo reset password with password/forget uuid,old password,new password
 	// Todo add getUserByToken api
 	// Todo add validateToken api
 }

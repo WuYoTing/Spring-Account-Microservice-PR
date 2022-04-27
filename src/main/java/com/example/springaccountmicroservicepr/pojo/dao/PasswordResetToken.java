@@ -25,4 +25,10 @@ public class PasswordResetToken {
 
 	@Column(nullable = false)
 	private Instant expiryDate;
+
+	public PasswordResetToken(User user, String token, Instant expiryDate) {
+		this.user = user;
+		this.token = token;
+		this.expiryDate = expiryDate;
+	}
 }
