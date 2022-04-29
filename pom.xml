@@ -96,11 +96,6 @@
 			<artifactId>jjwt</artifactId>
 			<version>0.9.1</version>
 		</dependency>
-		<!-- sendgrid-java -->
-		<dependency>
-			<groupId>com.sendgrid</groupId>
-			<artifactId>sendgrid-java</artifactId>
-		</dependency>
 		<!-- postgresql drive -->
 		<dependency>
 			<groupId>org.postgresql</groupId>

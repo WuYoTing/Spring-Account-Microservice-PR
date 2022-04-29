@@ -12,9 +12,13 @@ import com.example.springaccountmicroservicepr.pojo.response.MessageResponse;
 import com.example.springaccountmicroservicepr.pojo.response.TokenRefreshResponse;
 import com.example.springaccountmicroservicepr.pojo.vo.ProgressStatus;
 import com.example.springaccountmicroservicepr.services.AuthenticateService;
+import com.example.springaccountmicroservicepr.services.MailService;
 import com.example.springaccountmicroservicepr.services.TokenService;
+import com.example.springaccountmicroservicepr.share.RegexPatterns;
 import com.example.springaccountmicroservicepr.util.JwtUtil;
-import com.example.springaccountmicroservicepr.util.PatternsUtil;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -31,10 +35,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
-import java.util.List;
-import java.util.stream.Collectors;
-
 @RestController
 @RequestMapping("/api/auth")
 @AllArgsConstructor(onConstructor = @__(@Autowired))
@@ -43,6 +43,8 @@ public class AuthController {
 	private JwtUtil jwtUtil;
 	private AuthenticateService authenticateService;
 	private TokenService tokenService;
+
+	private MailService mailService;
 
 	@PostMapping("/login")
 	public ResponseEntity<JwtResponse> authenticateUser(
@@ -89,16 +91,18 @@ public class AuthController {
 
 	@GetMapping("/password/forget")
 	public ResponseEntity<MessageResponse> passwordForget(
-		@RequestParam @NotBlank(message = "email is required") @Size(max = 50, message = "invalid email size") @Pattern(regexp = PatternsUtil.emailPattern, message = "invalid email") String email) {
+		@RequestParam @NotBlank(message = "email is required")
+		@Size(max = 50, message = "invalid email size")
+		@Pattern(regexp = RegexPatterns.Email_Pattern, message = "invalid email")
+		String email
+	) {
 		PasswordResetToken passwordResetToken = tokenService.passwordForget(email);
-		// Todo Send mail notify with uuid
+		mailService.sendResetTokenEmail(email, passwordResetToken);
 		return new ResponseEntity<>(
 			new MessageResponse(ProgressStatus.Success, "User registered successfully!"),
 			HttpStatus.OK);
 	}
 
 	// Todo reset password with password/forget uuid,old password,new password
-	// Todo add getUserByToken api
-	// Todo add validateToken api
 }
 

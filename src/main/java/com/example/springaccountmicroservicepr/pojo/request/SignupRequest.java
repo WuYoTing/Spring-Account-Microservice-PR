@@ -1,6 +1,6 @@
 package com.example.springaccountmicroservicepr.pojo.request;
 
-import com.example.springaccountmicroservicepr.util.PatternsUtil;
+import com.example.springaccountmicroservicepr.share.RegexPatterns;
 import java.util.Set;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -19,7 +19,7 @@ public class SignupRequest {
 	// Todo Make Email Check more complex
 	@NotBlank(message = "email is required")
 	@Size(max = 50, message = "invalid email size")
-	@Pattern(regexp = PatternsUtil.emailPattern, message = "invalid email")
+	@Pattern(regexp = RegexPatterns.Email_Pattern, message = "invalid email")
 	private String email;
 
 	@NotEmpty(message = "role should not by empty")
