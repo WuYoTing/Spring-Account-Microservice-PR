@@ -5,6 +5,8 @@ import com.example.springaccountmicroservicepr.pojo.dao.PasswordResetToken;
 import com.example.springaccountmicroservicepr.pojo.dao.RefreshToken;
 import com.example.springaccountmicroservicepr.pojo.dto.UserDetailsImpl;
 import com.example.springaccountmicroservicepr.pojo.request.LoginRequest;
+import com.example.springaccountmicroservicepr.pojo.request.PasswordForgetRequest;
+import com.example.springaccountmicroservicepr.pojo.request.PasswordResetRequest;
 import com.example.springaccountmicroservicepr.pojo.request.SignupRequest;
 import com.example.springaccountmicroservicepr.pojo.request.TokenRefreshRequest;
 import com.example.springaccountmicroservicepr.pojo.response.JwtResponse;
@@ -20,14 +22,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
+import org.apache.logging.log4j.core.config.plugins.validation.constraints.Required;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,6 +41,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Validated
 @RestController
 @RequestMapping("/api/auth")
 @AllArgsConstructor(onConstructor = @__(@Autowired))
@@ -43,7 +50,6 @@ public class AuthController {
 	private JwtUtil jwtUtil;
 	private AuthenticateService authenticateService;
 	private TokenService tokenService;
-
 	private MailService mailService;
 
 	@PostMapping("/login")
@@ -89,11 +95,12 @@ public class AuthController {
 				"Refresh token is not in database!"));
 	}
 
+
 	@GetMapping("/password/forget")
 	public ResponseEntity<MessageResponse> passwordForget(
-		@RequestParam @NotBlank(message = "email is required")
 		@Size(max = 50, message = "invalid email size")
 		@Pattern(regexp = RegexPatterns.Email_Pattern, message = "invalid email")
+		@RequestParam(required = true)
 		String email
 	) {
 		PasswordResetToken passwordResetToken = tokenService.passwordForget(email);
@@ -103,6 +110,19 @@ public class AuthController {
 			HttpStatus.OK);
 	}
 
-	// Todo reset password with password/forget uuid,old password,new password
+	/**
+	 * reset password with password/forget uuid,new password
+	 */
+	@PostMapping("password/reset")
+	public ResponseEntity<MessageResponse> passwordReset(
+		@Valid @RequestBody PasswordResetRequest request
+	) {
+		authenticateService.passwordReset(request.getUuid(), request.getNewPassword());
+		return new ResponseEntity<>(
+			new MessageResponse(ProgressStatus.Success, "User registered successfully!"),
+			HttpStatus.OK);
+	}
+
+	// Todo login with password reset token
 }
 

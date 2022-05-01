@@ -4,6 +4,11 @@ import com.example.springaccountmicroservicepr.exception.NotFoundException;
 import com.example.springaccountmicroservicepr.exception.TokenRefreshException;
 import com.example.springaccountmicroservicepr.pojo.response.MessageResponse;
 import com.example.springaccountmicroservicepr.pojo.vo.ProgressStatus;
+import java.util.Collections;
+import java.util.Map;
+import java.util.stream.Collectors;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,12 +52,12 @@ public class RestExceptionHandler {
 			if (!errors.isEmpty()) {
 				FieldError fieldError = (FieldError) errors.get(0);
 				return new ResponseEntity<>(
-					new MessageResponse(ProgressStatus.Fail, fieldError.getDefaultMessage()),
+					new MessageResponse(ProgressStatus.Error, fieldError.getDefaultMessage()),
 					HttpStatus.FORBIDDEN);
 			}
 		}
 		return new ResponseEntity<>(
-			new MessageResponse(ProgressStatus.Fail, "Request Parameter Error"),
+			new MessageResponse(ProgressStatus.Error, "Request Parameter Error"),
 			HttpStatus.FORBIDDEN);
 	}
 
@@ -76,6 +81,22 @@ public class RestExceptionHandler {
 		return new ResponseEntity<>(
 			new MessageResponse(ProgressStatus.Error, e.getMessage()),
 			HttpStatus.NOT_FOUND);
+	}
+
+	/**
+	 * Handle @RequestParam Validate Fail
+	 */
+	@ExceptionHandler(ConstraintViolationException.class)
+	@ResponseBody
+	public ResponseEntity<MessageResponse> handleViolationException(ConstraintViolationException e) {
+		List<String> errorMessages = e.getConstraintViolations()
+			.stream()
+			.map(ConstraintViolation::getMessage)
+			.collect(Collectors.toList());
+
+		return new ResponseEntity<>(
+			new MessageResponse(ProgressStatus.Error, errorMessages.get(0)),
+			HttpStatus.FORBIDDEN);
 	}
 
 }

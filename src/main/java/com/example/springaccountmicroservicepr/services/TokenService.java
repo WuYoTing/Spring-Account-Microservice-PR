@@ -32,10 +32,14 @@ public class TokenService {
 	private PasswordResetTokenRepository passwordResetTokenRepository;
 
 	@Autowired
-	public TokenService(RefreshTokenRepository refreshTokenRepository,
-		UserRepository userRepository) {
+	public TokenService(
+		RefreshTokenRepository refreshTokenRepository,
+		UserRepository userRepository,
+		PasswordResetTokenRepository passwordResetTokenRepository
+	) {
 		this.refreshTokenRepository = refreshTokenRepository;
 		this.userRepository = userRepository;
+		this.passwordResetTokenRepository = passwordResetTokenRepository;
 	}
 
 
@@ -44,12 +48,9 @@ public class TokenService {
 	}
 
 	public RefreshToken createRefreshToken(Long userId) {
-		Optional<User> userOptional = userRepository.findById(userId);
-		if (!userOptional.isPresent()) {
-			log.error("Error: Username Not Exist");
-			throw new NotFoundException("Username Not Exist!");
-		}
-		RefreshToken refreshToken = new RefreshToken(userOptional.get(), UUID.randomUUID().toString(),
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new NotFoundException("Username Not Exist!"));
+		RefreshToken refreshToken = new RefreshToken(user, UUID.randomUUID().toString(),
 			Instant.now().plusMillis(jwtRefreshExpirationMs));
 		refreshToken = refreshTokenRepository.save(refreshToken);
 		return refreshToken;
@@ -66,12 +67,9 @@ public class TokenService {
 
 	@Transactional
 	public int deleteByUserId(Long userId) {
-		Optional<User> userOptional = userRepository.findById(userId);
-		if (!userOptional.isPresent()) {
-			log.error("Error: Username Not Exist");
-			throw new NotFoundException("Username Not Exist!");
-		}
-		return refreshTokenRepository.deleteByUser(userOptional.get());
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new NotFoundException("Username Not Exist!"));
+		return refreshTokenRepository.deleteByUser(user);
 	}
 
 

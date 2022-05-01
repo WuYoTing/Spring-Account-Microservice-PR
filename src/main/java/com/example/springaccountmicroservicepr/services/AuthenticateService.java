@@ -2,13 +2,14 @@ package com.example.springaccountmicroservicepr.services;
 
 
 import com.example.springaccountmicroservicepr.exception.NotFoundException;
+import com.example.springaccountmicroservicepr.pojo.dao.PasswordResetToken;
 import com.example.springaccountmicroservicepr.pojo.dao.RolesType;
 import com.example.springaccountmicroservicepr.pojo.dao.User;
 import com.example.springaccountmicroservicepr.pojo.vo.ERole;
+import com.example.springaccountmicroservicepr.services.repository.PasswordResetTokenRepository;
 import com.example.springaccountmicroservicepr.services.repository.RoleRepository;
 import com.example.springaccountmicroservicepr.services.repository.UserRepository;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.AllArgsConstructor;
@@ -25,10 +26,11 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 public class AuthenticateService {
 
-	UserRepository userRepository;
-	RoleRepository roleRepository;
 	AuthenticationManager authenticationManager;
 	PasswordEncoder encoder;
+	UserRepository userRepository;
+	RoleRepository roleRepository;
+	PasswordResetTokenRepository passwordResetTokenRepository;
 
 	public Authentication getUserAuthentication(String username, String password) {
 		return authenticationManager.authenticate(
@@ -48,7 +50,6 @@ public class AuthenticateService {
 		}
 
 		// Create new user's account
-		User user = new User(username, email, encoder.encode(password));
 		List<RolesType> rolesTypes = new ArrayList<>();
 
 		if (strRoles == null) {
@@ -60,25 +61,34 @@ public class AuthenticateService {
 				switch (role) {
 					case "admin":
 						RolesType adminRolesType = roleRepository.findByName(ERole.ROLE_ADMIN)
-							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+							.orElseThrow(() -> new RuntimeException("Role is not found."));
 						rolesTypes.add(adminRolesType);
 						break;
 					case "mod":
 						RolesType modRolesType = roleRepository.findByName(ERole.ROLE_MODERATOR)
-							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+							.orElseThrow(() -> new RuntimeException("Role is not found."));
 						rolesTypes.add(modRolesType);
 						break;
 					default:
 						RolesType userRolesType = roleRepository.findByName(ERole.ROLE_USER)
-							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+							.orElseThrow(() -> new RuntimeException("Role is not found."));
 						rolesTypes.add(userRolesType);
 				}
 			});
 		}
 
-		user.setRolesTypes(rolesTypes);
+		User user = new User(username, email, encoder.encode(password), rolesTypes);
 		return userRepository.save(user);
 	}
 
 
+	public Boolean passwordReset(String uuid, String newPassword) {
+		PasswordResetToken passwordResetTokenOptional = passwordResetTokenRepository.findByToken(uuid)
+			.orElseThrow(() -> new NotFoundException("Reset Record Not Exist!"));
+		User user = passwordResetTokenOptional.getUser();
+		// Todo Maybe need to check if is same as last time
+		user.updatePassword(encoder.encode(newPassword));
+		userRepository.save(user);
+		return true;
+	}
 }

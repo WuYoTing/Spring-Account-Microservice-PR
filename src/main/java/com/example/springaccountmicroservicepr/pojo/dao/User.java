@@ -7,11 +7,11 @@ import javax.validation.constraints.*;
 import lombok.*;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = "username"),
+@Table(name = "users", uniqueConstraints = {
+	@UniqueConstraint(columnNames = "username"),
 	@UniqueConstraint(columnNames = "email")})
 public class User {
 
@@ -39,9 +39,14 @@ public class User {
 	@JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_type_id"))
 	private List<RolesType> rolesTypes = new ArrayList<>();
 
-	public User(String username, String email, String password) {
+	public User(String username, String email, String password, List<RolesType> rolesTypes) {
 		this.username = username;
 		this.email = email;
 		this.password = password;
+		this.rolesTypes = rolesTypes;
+	}
+
+	public void updatePassword(String newPassword) {
+		this.password = newPassword;
 	}
 }

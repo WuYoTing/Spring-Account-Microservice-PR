@@ -28,10 +28,9 @@ public class SpringSecurityWebAuthTestConfig {
 	public void userDetailsService() {
 		log.info("SpringSecurityWebAuthTestConfig start");
 		// Basic User
-		User basicUser = new User("test", "Test@gmail.com", encoder.encode("test"));
 		List<RolesType> rolesTypes = new ArrayList<>();
 		rolesTypes.add(new RolesType(1, ERole.ROLE_USER));
-		basicUser.setRolesTypes(rolesTypes);
+		User basicUser = new User("test", "Test@gmail.com", encoder.encode("test"), rolesTypes);
 		userRepository.save(basicUser);
 		log.info("SpringSecurityWebAuthTestConfig end");
 	}
