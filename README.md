@@ -1,5 +1,5 @@
 <p align="center">
-  <h2 align="center">Spring-Account-Microservice-PR</h2>
+  <h2 align="center">Spring-Boot-Account-Service</h2>
 </p>
 <p align="center">
    <img src="https://img.shields.io/badge/language-java-brightgreen?style"/>
@@ -24,5 +24,6 @@ application.properties
 
 ## Feature
 
-1. Add H2 DB for Test
-2. Add Unit Test
+1. [X] Add H2 DB for Test
+2. [X] Add Unit Test
+3. [ ] Add Forget Password Mail Notify
