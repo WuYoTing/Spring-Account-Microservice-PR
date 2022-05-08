@@ -1,11 +1,11 @@
 package com.example.springaccountmicroservicepr.config;
 
+import com.example.springaccountmicroservicepr.exception.JwtTokenException;
 import com.example.springaccountmicroservicepr.exception.NotFoundException;
 import com.example.springaccountmicroservicepr.exception.TokenRefreshException;
 import com.example.springaccountmicroservicepr.pojo.response.MessageResponse;
 import com.example.springaccountmicroservicepr.pojo.vo.ProgressStatus;
-import java.util.Collections;
-import java.util.Map;
+import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -22,23 +22,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.List;
-import org.springframework.web.context.request.WebRequest;
-
 @Log4j2
 @RestControllerAdvice
 public class RestExceptionHandler {
-
-	/**
-	 * Handle Access Deny
-	 */
-	@ResponseBody
-	@ExceptionHandler(AccessDeniedException.class)
-	public ResponseEntity<MessageResponse> handleAccessDeniedException(Exception ex) {
-		log.error("Access Denied : {}", ex.getMessage());
-		MessageResponse messageResp = new MessageResponse(ProgressStatus.Fail, ex.getMessage());
-		return new ResponseEntity<>(messageResp, HttpStatus.FORBIDDEN);
-	}
 
 	/**
 	 * Handle Validation Fail
@@ -62,12 +48,22 @@ public class RestExceptionHandler {
 	}
 
 	/**
-	 * Handle Token Expired
+	 * Handle JWT Token Exception
+	 */
+	@ExceptionHandler(value = JwtTokenException.class)
+	@ResponseStatus(HttpStatus.FORBIDDEN)
+	public ResponseEntity<MessageResponse> handleJwtTokenException(JwtTokenException ex) {
+		return new ResponseEntity<>(new MessageResponse(ProgressStatus.Fail, ex.getMessage()),
+			HttpStatus.FORBIDDEN);
+	}
+
+
+	/**
+	 * Handle Refresh Token Exception
 	 */
 	@ExceptionHandler(value = TokenRefreshException.class)
 	@ResponseStatus(HttpStatus.FORBIDDEN)
-	public ResponseEntity<MessageResponse> handleTokenRefreshException(TokenRefreshException ex,
-		WebRequest request) {
+	public ResponseEntity<MessageResponse> handleTokenRefreshException(TokenRefreshException ex) {
 		return new ResponseEntity<>(new MessageResponse(ProgressStatus.Fail, ex.getMessage()),
 			HttpStatus.FORBIDDEN);
 	}
@@ -99,4 +95,14 @@ public class RestExceptionHandler {
 			HttpStatus.FORBIDDEN);
 	}
 
+	/**
+	 * Handle Access Deny
+	 */
+	@ResponseBody
+	@ExceptionHandler(AccessDeniedException.class)
+	public ResponseEntity<MessageResponse> handleAccessDeniedException(Exception ex) {
+		log.error("Access Denied : {}", ex.getMessage());
+		MessageResponse messageResp = new MessageResponse(ProgressStatus.Fail, ex.getMessage());
+		return new ResponseEntity<>(messageResp, HttpStatus.FORBIDDEN);
+	}
 }
