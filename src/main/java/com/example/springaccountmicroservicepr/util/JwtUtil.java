@@ -32,6 +32,7 @@ public class JwtUtil {
 
 	public String generateTokenFromUsername(String userName) {
 		return Jwts.builder()
+			.setHeaderParam("typ", Header.JWT_TYPE)
 			.setSubject(userName)
 			.setIssuedAt(new Date())
 			.setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
