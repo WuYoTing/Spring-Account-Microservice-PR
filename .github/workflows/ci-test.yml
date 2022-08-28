@@ -13,8 +13,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest ]
-        distribution: [ 'adopt', 'zulu' ]
-        version: [ '11' ]
+        distribution: [ 'microsoft' ]
+        version: [ '17' ]
 
     name: ${{ matrix.distribution }} ${{ matrix.version }} (jdk-x64) - ${{ matrix.os }} - Test
 
