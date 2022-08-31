@@ -140,6 +140,12 @@
 			<artifactId>spring-boot-starter-cache</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
+			<!-- spring-boot-starter-actuator -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>
